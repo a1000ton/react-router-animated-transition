@@ -1,25 +1,79 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch,
+  useLocation,
+  useParams,
+  Link,
+} from "react-router-dom";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./styles.css";
 
-function App() {
+const RGB = () => {
+  const { r, g, b } = useParams();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="fill rgb" style={{ background: `rgb(${r},${g},${b})` }}>
+      rgb({r},{g},{b})
     </div>
   );
-}
+};
 
-export default App;
+const HSL = () => {
+  const { h, s, l } = useParams();
+
+  return (
+    <div className="fill hsl" style={{ background: `hsl(${h},${s}%,${l}%)` }}>
+      hsl({h},{s}%,{l}%)
+    </div>
+  );
+};
+
+const Content = () => {
+  const location = useLocation();
+
+  return (
+    <div className="fill content">
+      <TransitionGroup>
+        <CSSTransition timeout={300} classNames="fade" key={location.key}>
+          <Switch location={location}>
+            <Route exact path="/hsl/:h/:s/:l">
+              <HSL />
+            </Route>
+            <Route exact path="/rgb/:r/:g/:b">
+              <RGB />
+            </Route>
+            <Route path="*">
+              <div>Not Found</div>
+            </Route>
+          </Switch>
+        </CSSTransition>
+      </TransitionGroup>
+    </div>
+  );
+};
+
+export default function App() {
+  return (
+    <Router>
+      <div className="fill">
+        <Route exact path="/">
+          <Redirect to="hsl/0/89/55" />
+        </Route>
+
+        <ul className="nav">
+          <Link to="/hsl/0/89/55">Red</Link>
+          <Link to="/hsl/278/81/54">Purple</Link>
+          <Link to="/hsl/214/82/55">Blue</Link>
+          <Link to="/rgb/244/247/62">Yellow</Link>
+          <Link to="/rgb/235/48/193">Pink</Link>
+          <Link to="/rgb/47/235/210">Aqua</Link>
+        </ul>
+
+        <Content />
+      </div>
+    </Router>
+  );
+}
